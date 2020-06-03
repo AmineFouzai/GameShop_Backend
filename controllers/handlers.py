@@ -4,9 +4,9 @@ Preset controller by torn for / route
 '''
 from .modules import *
 
-UPLOADS='uploads'
-SECRET='secret'
-ALGORITHM='HS256'
+UPLOADS=os.environ.get('UPATH')
+SECRET=os.environ.get('SECRET')
+ALGORITHM=os.environ.get('SECRET')
 
 
 
