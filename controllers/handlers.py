@@ -6,7 +6,7 @@ from .modules import *
 
 UPLOADS=os.environ.get('UPATH')
 SECRET=os.environ.get('SECRET')
-ALGORITHM=os.environ.get('SECRET')
+ALGORITHM=os.environ.get('ALGORITHM')
 
 
 
