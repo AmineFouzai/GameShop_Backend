@@ -4,7 +4,7 @@ from  tornado.escape import json_decode
 from bson.json_util import dumps
 from bson import decode_all,ObjectId
 import hashlib
-
+import os
 CLIENT=MongoClient(os.environ.get('URI'))
         
 class User(object):
