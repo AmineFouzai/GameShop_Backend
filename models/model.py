@@ -5,7 +5,7 @@ from bson.json_util import dumps
 from bson import decode_all,ObjectId
 import hashlib
 
-CLIENT=MongoClient("mongodb+srv://john:98AXuxEymBRYVt18@dolphineducation-vovf3.mongodb.net/test?retryWrites=true&w=majority")
+CLIENT=MongoClient(os.environ.get('URI'))
         
 class User(object):
     def __init__(self,name=None,email=None,password=None,SessionID=None):
