@@ -26,24 +26,5 @@ route = [
 			handlers.DownloadGameRequestHandler
 		)
 
-
 ]
 				
-'''
-/home
-/settings
-/login
-/signup
-
-
-GET /games
-POST /games
-PUT /games
-DELETE /games
-GET /clients
-POST /clients
-PUT /clients
-DELETE /clients
-GET /games/:id
-GET /clients/:id
-'''
