@@ -8,8 +8,6 @@ UPLOADS=os.environ.get('UPATH')
 SECRET=os.environ.get('SECRET')
 ALGORITHM=os.environ.get('ALGORITHM')
 
-
-
 class BaseHandler(tornado.web.RequestHandler):
         
     def get_current_user(self):
@@ -32,11 +30,15 @@ class SignupRequestHandler(BaseHandler):
         user=tornado.escape.json_decode(self.request.body)
         client=model.User(name=user['name'],email=user['email'],password=user['password'],SessionID=str(SessionID))
         if not client.add_user():
-            self.write(tornado.escape.json_encode(dict(code=403,msg='user already exist')))
+            self.set_status(status_code=403)
+            self.write(tornado.escape.json_encode(dict(msg='user already exist')))
         else:
             client.add_user()
             user=client.find_user_by_SessionID(str(SessionID))
-            self.write(tornado.escape.json_encode(dict(encoded_jwt=jwt.encode(
+
+            self.write(tornado.escape.json_encode(dict(
+                SessionID=str(SessionID),
+                encoded_jwt=jwt.encode(
                 {   "id":str(user['_id']),
                     "name":user['name'],
                     "email":user['email'],
@@ -44,10 +46,11 @@ class SignupRequestHandler(BaseHandler):
                 },SECRET, algorithm=ALGORITHM).decode('UTF-8')
                 )))
     
-    def options(self,arg):
+    def options(self):
         self.set_status(204)
         self.finish()
         
+
 
 class LoginRequestHandler(BaseHandler):
     
@@ -59,10 +62,12 @@ class LoginRequestHandler(BaseHandler):
     
     
     def get(self):
+        self.set_status(status_code=401)
         self.write(tornado.escape.json_encode(dict(
-            code=401,
             msg="unauthenticated client"
         )))
+
+
     def post(self):
         SessionID=uuid4()
         self.set_secure_cookie('SessionID',str(SessionID))
@@ -70,26 +75,45 @@ class LoginRequestHandler(BaseHandler):
         client=model.User(email=user['email'],password=user['password'],SessionID=str(SessionID))
         if client.login(str(SessionID)): 
             user=client.find_user_by_SessionID(str(SessionID))
-            self.write(tornado.escape.json_encode(dict(encoded_jwt=jwt.encode(
+            # self.set_cookie('SessionID',str(SessionID))
+            self.write(tornado.escape.json_encode(dict(
+                SessionID=str(SessionID),
+                encoded_jwt=jwt.encode(
                 {   "id":str(user['_id']),
                     "name":user['name'],
                     "email":user['email'],
                     "password":user['password']
                 },SECRET, algorithm=ALGORITHM).decode('UTF-8')
                 )))
+        
         else:
-            self.write(tornado.escape.json_encode(dict(code=404,msg='user does not exist')))
+            self.set_status(status_code=404)
+            self.write(tornado.escape.json_encode(dict(msg='user does not exist')))
     
-    def options(self,arg):
+    def options(self):
         self.set_status(204)
         self.finish()
 
 
+
+
+
 class LogoutRequestHandler(BaseHandler):
+       
+    def set_default_headers(self):
+        self.set_header("access-control-allow-origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS')
+        self.set_header("Access-Control-Allow-Headers", "access-control-allow-origin,authorization,content-type") 
     
-        def get(self):
+    def get(self):
             self.clear_all_cookies()
             self.redirect('/login')
+
+    def options(self,arg):
+        self.set_status(204)
+        self.finish()
+
 
 
 
@@ -109,6 +133,7 @@ class GameCRUDRequestHandler(BaseHandler):
         else:
             self.write(tornado.escape.json_encode(games.get()))	
             
+                
     @tornado.web.authenticated
     def post(self,arg):
         token=self.request.headers.get('Authorization').replace("Bearer ",'')
@@ -126,19 +151,7 @@ class GameCRUDRequestHandler(BaseHandler):
             file_name=games.file_name
         )))
 
-    @tornado.web.authenticated   
-    def put(self,arg):
-        token=self.request.headers.get('Authorization').replace("Bearer ",'')
-        user=jwt.decode(token,SECRET,algorithms=ALGORITHM)
-        game=tornado.escape.json_decode(self.request.body)
-        games=model.Game(title=game['title'],description=game['description'],user_id=user['id'])
-        game=games.update(game['id'])
-        self.write(tornado.escape.json_encode(dict(
-            _id=game['_id'],
-            title=game['title'],
-            description=game['description'],
-            file_name=game['file_name']
-        )))
+   
 
     @tornado.web.authenticated
     def delete(self,arg):
