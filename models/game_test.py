@@ -3,6 +3,11 @@ from uuid import uuid4
 from halo import Halo
 import json
 
+from model import *
+from uuid import uuid4
+from halo import Halo
+import json
+
 
 spinner=Halo(text_color="blue")
 spinner.start()
@@ -30,14 +35,6 @@ try:
     spinner.text_color="blue"
     spinner.info(text="Recovering Game by id =>")
     print(json.dumps(game1.find_one_by_id(iserted_id), indent=4, sort_keys=True))
-    spinner.text_color="green"
-    spinner.succeed(text="passed")
-    print('+++++++++++++++++++++++++')
-    spinner.text_color="blue"
-    spinner.info(text="Updating game by id =>")
-    game1.title="game4"
-    game1.description="game 1 changed to game4"
-    print(json.dumps(game1.update(iserted_id), indent=4, sort_keys=True))
     spinner.text_color="green"
     spinner.succeed(text="passed")
     print('+++++++++++++++++++++++++')
