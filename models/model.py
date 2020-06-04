@@ -5,9 +5,11 @@ from bson.json_util import dumps
 from bson import decode_all,ObjectId
 import hashlib
 import os
+
 CLIENT=MongoClient(os.environ.get('URI'))
-        
+
 class User(object):
+    
     def __init__(self,name=None,email=None,password=None,SessionID=None):
         self.db=CLIENT.users
         self.name=name
@@ -16,7 +18,6 @@ class User(object):
         self.SessionID=SessionID
         
     def add_user(self):
-    
         return self.db.user.insert_one({
             "name":self.name,
             "email":self.email,
@@ -27,7 +28,6 @@ class User(object):
     def find_user_by_SessionID(self,SessionID):
         document=self.db.user.find_one({'SessionID':SessionID})
         return document
-
 
     def authanticate(self,email,password):
         user=dict()
@@ -41,33 +41,51 @@ class User(object):
         else:
             return False
 
-
-
+    def update(self,_id):
+        user= self.db.user.find_one_and_update(
+            {
+                "_id":ObjectId(_id)
+            },
+            {
+                "$set":{
+                        "name":self.name,
+                        "email":self.email,
+                        "password":self.password
+                }
+            },return_document=ReturnDocument.AFTER)
+        user['_id']=str(user['_id'])
+        return user
+        
+    def delete(self,_id):
+        document=self.db.user.find_one_and_delete({"_id":ObjectId(_id)})
+        document['_id']=str(document['_id'])
+        return document
 
 
 class Game(object):
 
-    def __init__(self,title=None,description=None,file_name=None,user_id=None):
+    def __init__(self,title=None,description=None,file_name=None,user_id=None,user_name=None):
         self.db=CLIENT.games
         self.title=title
         self.description=description
         self.file_name=file_name
         self.user_id=user_id
+        self.user_name=user_name
 
-    def add(self):
-        
-        return self.db.game.insert_one({
-            "title":self.title,
-            "description":self.description,
-            "file_name":self.file_name,
-            "user_id":self.user_id
+    def add(self):        
+        return self.db.game.insert_one(
+            {
+                "title":self.title,
+                "description":self.description,
+                "file_name":self.file_name,
+                "user_id":self.user_id,
+                "name":self.user_name
             })
         
     def delete(self,_id):
         document=self.db.game.find_one_and_delete({"_id":ObjectId(_id)})
         document['_id']=str(document['_id'])
         return document
-
         
     def find_one_by_id(self,_id):
         document= self.db.game.find_one({"_id": ObjectId(_id)})
@@ -79,11 +97,5 @@ class Game(object):
         documents=self.db.game.find({})
         for document in documents:
             document['_id']=str(document['_id'])
-            print(document)
             data.append(document)
         return data
-    
-       
-
-
-
