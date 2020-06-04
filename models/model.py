@@ -68,19 +68,6 @@ class Game(object):
         document['_id']=str(document['_id'])
         return document
 
-    def update(self,_id):
-
-        document= self.db.game.find_one_and_update(
-            {
-                "_id":ObjectId(_id)
-            },{
-                "$set":{
-                    "title":self.title,
-                    "description":self.description,
-            }
-            },return_document=ReturnDocument.AFTER)
-        document['_id']=str(document['_id'])
-        return document
         
     def find_one_by_id(self,_id):
         document= self.db.game.find_one({"_id": ObjectId(_id)})
