@@ -34,7 +34,7 @@ class UserRequestHnadler(tornado.web.RequestHandler):
                 "id":str(user['id']),
                 "name":new_user_record['name'],
                 "email":new_user_record['email'],
-                "password":new_user_record['password']
+               # "password":new_user_record['password']
             },SECRET, algorithm=ALGORITHM).decode('UTF-8')
             )))
     
@@ -74,7 +74,7 @@ class SignupRequestHandler(BaseHandler):
                 {   "id":str(user['_id']),
                     "name":user['name'],
                     "email":user['email'],
-                    "password":user['password']
+                #    "password":user['password']
                 },SECRET, algorithm=ALGORITHM).decode('UTF-8')
                 )))
     
@@ -109,7 +109,7 @@ class LoginRequestHandler(BaseHandler):
                     "id":str(user['_id']),
                     "name":user['name'],
                     "email":user['email'],
-                    "password":user['password']
+                #    "password":user['password']
                 },SECRET, algorithm=ALGORITHM).decode('UTF-8')
                 )))
         
